@@ -17,6 +17,7 @@
 #define BITS_PER_CHAR 7
 #define LSBS 3
 
+// convenience function for printing - ignore
 void PrintHex(short *vals, char *msg) {
    int i;
 
@@ -35,11 +36,9 @@ void PrintHex(short *vals, char *msg) {
 
 // block 1
 void EmbedWatermark(short *vals, char *msg) {
-   int i;   
-   unsigned int mask = LSBS | LSBS << 2;  // 0xF
+   unsigned int i, mask = LSBS | LSBS << 2;  // 0xF
    for (i = 0; i < NUM_CHARS; i++) {
-      short flagIdx = i/LSBS + NUM_VALS - LSBS - 1;
-      short flagPos = i%LSBS;
+      short flagIdx = i/LSBS + NUM_VALS - LSBS - 1, flagPos = i%LSBS;
 
       // clear the value at the flag index and mapped position
       vals[flagIdx] &= ~(1 << flagPos);
@@ -53,10 +52,10 @@ void EmbedWatermark(short *vals, char *msg) {
       }
 
       short insertIdx = i*2;
-      vals[insertIdx] = (vals[insertIdx] & ~(mask >> 1)) | r_nibble;
+      vals[insertIdx] = vals[insertIdx] & ~(mask >> 1) | r_nibble;
 
       // handle left nibble (left of the least sig. nibble)
-      vals[insertIdx + 1] = (vals[insertIdx + 1] & ~(mask >> 1)) | 
+      vals[insertIdx + 1] = vals[insertIdx + 1] & ~(mask >> 1) | 
        (msg[i] & mask << LSBS + 1) >> LSBS + 1;
    }
 }
