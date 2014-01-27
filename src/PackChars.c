@@ -36,8 +36,9 @@ void PrintHex(short *vals, char *msg) {
 
 // block 1
 void EmbedWatermark(short *vals, char *msg) {
-   unsigned int i, mask = LSBS | LSBS << 2;  // 0xF
-   int maskFFF8 = mask >> 1;
+   // 0xF
+   unsigned int i, mask = LSBS | LSBS << 2, maskFFF8 = mask >> 1;
+
    for (i = 0; i < NUM_CHARS; i++) {
       short flagIdx = i/LSBS + NUM_CHARS*2 , flagPos = 1 << i%LSBS, 
        insertIdx = i*2;
