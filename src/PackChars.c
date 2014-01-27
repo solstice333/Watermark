@@ -39,20 +39,19 @@ void EmbedWatermark(short *vals, char *msg) {
    unsigned int i, mask = LSBS | LSBS << 2;  // 0xF
    int maskFFF8 = mask >> 1;
    for (i = 0; i < NUM_CHARS; i++) {
-      short flagIdx = i/LSBS + NUM_CHARS*2 , flagPos = i%LSBS;
-
-      // clear the value at the flag index and mapped position
-      vals[flagIdx] &= ~(1 << flagPos);
-
-      // handle right most nibble (least sig. nibble)
+      short flagIdx = i/LSBS + NUM_CHARS*2 , flagPos = 1 << i%LSBS, 
+       insertIdx = i*2;
       char r_nibble = msg[i] & mask;
 
+      // clear the value at the flag index and mapped position
+      vals[flagIdx] &= ~flagPos;
+
+      // handle right most nibble (least sig. nibble)
       if (r_nibble > MAX_DIFF) {
          r_nibble -= MAX_DIFF + 1;
-         vals[flagIdx] |= 1 << flagPos;
+         vals[flagIdx] |= flagPos;
       }
 
-      short insertIdx = i*2;
       vals[insertIdx] = vals[insertIdx] & ~maskFFF8 | r_nibble;
 
       // handle left nibble (left of the least sig. nibble)
