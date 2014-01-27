@@ -56,7 +56,7 @@ void EmbedWatermark(short *vals, char *msg) {
 
       // handle left nibble (left of the least sig. nibble)
       vals[insertIdx + 1] = vals[insertIdx + 1] & ~(mask >> 1) | 
-       (msg[i] & mask << LSBS + 1) >> LSBS + 1;
+       (msg[i] & ~mask) >> LSBS + 1;
    }
 }
 
