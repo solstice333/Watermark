@@ -52,11 +52,12 @@ void EmbedWatermark(short *vals, char *msg) {
          vals[flagIdx] |= 1 << flagPos;
       }
 
-      vals[i*2] = (vals[i*2] & ~(mask >> 1)) | r_nibble;
+      short insertIdx = i*2;
+      vals[insertIdx] = (vals[insertIdx] & ~(mask >> 1)) | r_nibble;
 
       // handle left nibble (left of the least sig. nibble)
-      char l_nibble = (msg[i] & mask << LSBS + 1) >> LSBS + 1;
-      vals[i*2 + 1] = (vals[i*2 + 1] & ~(mask >> 1)) | l_nibble;
+      vals[insertIdx + 1] = (vals[insertIdx + 1] & ~(mask >> 1)) | 
+       (msg[i] & mask << LSBS + 1) >> LSBS + 1;
    }
 }
 
