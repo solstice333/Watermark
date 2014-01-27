@@ -37,8 +37,9 @@ void PrintHex(short *vals, char *msg) {
 // block 1
 void EmbedWatermark(short *vals, char *msg) {
    unsigned int i, mask = LSBS | LSBS << 2;  // 0xF
+   int maskFFF8 = mask >> 1;
    for (i = 0; i < NUM_CHARS; i++) {
-      short flagIdx = i/LSBS + NUM_VALS - LSBS - 1, flagPos = i%LSBS;
+      short flagIdx = i/LSBS + NUM_CHARS*2 , flagPos = i%LSBS;
 
       // clear the value at the flag index and mapped position
       vals[flagIdx] &= ~(1 << flagPos);
@@ -52,10 +53,10 @@ void EmbedWatermark(short *vals, char *msg) {
       }
 
       short insertIdx = i*2;
-      vals[insertIdx] = vals[insertIdx] & ~(mask >> 1) | r_nibble;
+      vals[insertIdx] = vals[insertIdx] & ~maskFFF8 | r_nibble;
 
       // handle left nibble (left of the least sig. nibble)
-      vals[insertIdx + 1] = vals[insertIdx + 1] & ~(mask >> 1) | 
+      vals[insertIdx + 1] = vals[insertIdx + 1] & ~maskFFF8 | 
        (msg[i] & ~mask) >> LSBS + 1;
    }
 }
