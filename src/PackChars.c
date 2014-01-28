@@ -37,7 +37,7 @@ void PrintHex(short *vals, char *msg) {
 // block 1
 void EmbedWatermark(short *vals, char *msg) {
    // 0xF
-   unsigned int i, mask = LSBS | LSBS << 2, maskFFF8 = mask >> 1;
+   unsigned int i, mask = BITS_PER_CHAR*2 + 1, maskFFF8 = mask >> 1;
 
    for (i = 0; i < NUM_CHARS; i++) {
       short flagIdx = i/LSBS + NUM_CHARS*2 , flagPos = 1 << i%LSBS, 
@@ -48,14 +48,16 @@ void EmbedWatermark(short *vals, char *msg) {
       vals[flagIdx] &= ~flagPos;
 
       // handle right most nibble (least sig. nibble)
-      if (r_nibble > MAX_DIFF) {
-         r_nibble -= MAX_DIFF + 1;
-         vals[flagIdx] |= flagPos;
+      if (r_nibble > MAX_DIFF) { // if too big to store in 3 bits
+         r_nibble -= MAX_DIFF + 1; // cut it down by 8
+         vals[flagIdx] |= flagPos; // set the "add 8" flag in the bit flag map 
       }
+      
+      // put the 3 least sig bits in r_nibble into vals[insertIdx]
+      vals[insertIdx] = vals[insertIdx] & ~maskFFF8 | r_nibble; 
 
-      vals[insertIdx] = vals[insertIdx] & ~maskFFF8 | r_nibble;
-
-      // handle left nibble (left of the least sig. nibble)
+      // handle left nibble (left of the least sig. nibble) and put its 
+      // 3 least sig bits into vals[insertIdx + 1]
       vals[insertIdx + 1] = vals[insertIdx + 1] & ~maskFFF8 | 
        (msg[i] & ~mask) >> LSBS + 1;
    }
